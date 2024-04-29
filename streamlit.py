@@ -49,9 +49,11 @@ def main():
         st.success(f'The prediction is: {result}')
 
 def make_prediction(features):
+    # Use the loaded model to make predictions
+    # Replace this with the actual code for your model
     input_array = np.array(features).reshape(1, -1)
     prediction = model.predict(input_array)
     return prediction[0]
 
 if __name__ == '__main__':
-    main()
+    main()
