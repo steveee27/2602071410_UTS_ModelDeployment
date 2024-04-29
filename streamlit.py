@@ -1,13 +1,3 @@
-import subprocess
-import sys
-
-# Check if XGBoost is installed
-try:
-    import xgboost
-except ImportError:
-    # Install XGBoost
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "xgboost"])
-
 import streamlit as st
 import joblib
 import numpy as np
