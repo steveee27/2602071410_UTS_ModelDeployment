@@ -53,5 +53,5 @@ def make_prediction(features):
     prediction = model.predict(input_array)
     return prediction[0]
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     main()
