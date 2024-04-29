@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.preprocessing import RobustScaler
 
 # Load the machine learning model and encode
-model = joblib.load('xgb_classifier_model.pkl')
+model = joblib.load('lasthope.pkl')
 gender_encode= joblib.load('gender_encode.pkl')
 cr_card_encode = joblib.load('cr_card_encode.pkl')
 act_member_encode = joblib.load('act_member_encode.pkl')
