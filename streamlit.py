@@ -2,55 +2,56 @@ import streamlit as st
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import RobustScaler
 
-# Load the machine learning model and encoders
-binary_encode = joblib.load('Binary_Encode.pkl')
-scaler = joblib.load('StandardScaler.pkl')
-model = joblib.load('xgb_classifier_model.pkl')
+# Load the machine learning model and encode
+model = joblib.load('XG-class.pkl')
+gender_encode= joblib.load('gender_encode.pkl')
+cr_card_encode = joblib.load('cr_card_encode.pkl')
+act_member_encode = joblib.load('act_member_encode.pkl')
+
 
 def main():
-    st.title('Churn Prediction')
+    st.title('Churn Model Deployment')
+    
+    CreditScore = st.number_input("Credit Score :", 300,900)
+    Age = st.number_input("Input Age", 0, 100)
+    Gender = st.radio("Input Gender : ", ["Male","Female"])
+    Tenure = st.number_input("the period of time you holds a position (in years)", 0,100)
+    Balance = st.number_input("Balance :")
+    NumOfProducts = st.number_input("Number Of Products :")
+    HasCrCard = st.radio("I Have a Credit Card : ", ["Yes","No"])
+    IsActiveMember = st.radio("I am an Active Member : ", ["Yes","No"])
+    EstimatedSalary = st.number_input("Estimated Salary :")
 
-    # User input components
-    creditscore = st.number_input("Credit Score", min_value=0)
-    gender = st.selectbox("Gender", ['Male', 'Female'])
-    age = st.number_input("Age", min_value=0)
-    tenure = st.number_input("Tenure", min_value=0)
-    balance = st.number_input("Balance", min_value=0.0)
-    numofproducts = st.selectbox("Number of Products", [1, 2, 3, 4])
-    hascrcard = st.selectbox("Has Credit Card", ['Yes', 'No'])
-    isactivemember = st.selectbox("Is Active Member", ['Yes', 'No'])
-    estimatedsalary = st.number_input("Estimated Salary", min_value=0.0)
+    
+    data = {'Age': int(Age), 'Gender': Gender, 
+            'CreditScore':int(CreditScore),
+            'Tenure': int(Tenure), 'Balance':int(Balance),
+            'NumOfProducts': NumOfProducts, 'HasCrCard': HasCrCard,
+            'IsActiveMember':IsActiveMember,'EstimatedSalary':int(EstimatedSalary)}
+    
+    df=pd.DataFrame([list(data.values())], columns=['Age','Gender',  
+                                                'CreditScore', 'Tenure','Balance', 
+                                                'NumOfProducts', 'HasCrCard' ,'IsActiveMember', 'EstimatedSalary'])
+    
+    scaler = RobustScaler()
 
-    # Convert categorical inputs to encoded form
-    gender_encoded = binary_encode['Gender'][gender]
-    hascrcard_encoded = binary_encode['HasCrCard'][hascrcard]
-    isactivemember_encoded = binary_encode['IsActiveMember'][isactivemember]
+    df=df.replace(gender_encode)
+    df=df.replace(cr_card_encode)
+    df=df.replace(act_member_encode)
 
-    # Create input DataFrame
-    input_data = {
-        'CreditScore': creditscore,
-        'Age': age,
-        'Tenure': tenure,
-        'Balance': balance,
-        'NumOfProducts': numofproducts,
-        'HasCrCard': hascrcard_encoded,
-        'IsActiveMember': isactivemember_encoded,
-        'EstimatedSalary': estimatedsalary
-    }
-    input_df = pd.DataFrame([input_data])
-
-    # Scale numerical inputs
-    scaled_inputs = scaler.transform(input_df)
-
-    if st.button('Predict'):
-        prediction = make_prediction(scaled_inputs)
-        st.success(f'The prediction is: {prediction}')
+    df = scaler.fit_transform(df)
+    
+    if st.button('Make Prediction'):
+        features=df      
+        result = make_prediction(features)
+        st.success(f'The prediction is: {result}')
 
 def make_prediction(features):
-    # Use the loaded model to make predictions
-    prediction = model.predict(features)
+    input_array = np.array(features).reshape(1, -1)
+    prediction = model.predict(input_array)
     return prediction[0]
 
-if __name__ == '__main__':
-    main()
+if _name_ == '_main_':
+    main()
